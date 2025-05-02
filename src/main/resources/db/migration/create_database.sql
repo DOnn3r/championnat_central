@@ -1,0 +1,2 @@
+create database championnat_central;
+\c championnat_central
