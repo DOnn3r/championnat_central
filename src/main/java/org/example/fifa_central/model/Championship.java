@@ -10,7 +10,7 @@ import java.util.List;
 @Builder
 @Getter
 @Setter
-public class Championnat {
+public class Championship {
     private String championnatId;
     private String championnatName;
     private String pays;
