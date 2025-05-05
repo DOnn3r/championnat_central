@@ -13,54 +13,59 @@ import java.util.List;
 public class ChampionshipDAO {
     private final DataSource dataSource;
 
-    public ChampionshipDAO() {
-        this.dataSource = new DataSource();
+    public ChampionshipDAO(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     public List<Championship> getChampionshipRankings() {
-        List<Championship> championships = new ArrayList<>();
+        List<Championship> rankings = new ArrayList<>();
+
         String sql = """
-            WITH championship_stats AS (
+            WITH match_differences AS (
                 SELECT 
                     c.id_championnat,
-                    c.nom AS championship_name,
-                    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY scs.difference_buts) AS median_diff_goals
+                    c.nom AS championnat_nom,
+                    ABS(m.score_domicile - m.score_exterieur) AS ecart_buts
                 FROM 
-                    championnat c
+                    match m
                 JOIN 
-                    club cl ON c.id_championnat = cl.id_championnat
-                JOIN 
-                    stats_club_saison scs ON cl.id_club = scs.id_club
+                    championnat c ON m.id_championnat = c.id_championnat
+                WHERE 
+                    m.status = 'FINISHED'
+            ),
+            championship_stats AS (
+                SELECT 
+                    id_championnat,
+                    championnat_nom,
+                    PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY ecart_buts) AS mediane_ecart_buts
+                FROM 
+                    match_differences
                 GROUP BY 
-                    c.id_championnat, c.nom
+                    id_championnat, championnat_nom
             )
             SELECT 
-                cs.championship_name,
-                cs.median_diff_goals
+                championnat_nom,
+                mediane_ecart_buts
             FROM 
-                championship_stats cs
+                championship_stats
             ORDER BY 
-                cs.median_diff_goals ASC
+                mediane_ecart_buts ASC
             """;
 
-        try (Connection connection = dataSource.getConnection();
-             Statement statement = connection.createStatement();
-             ResultSet rs = statement.executeQuery(sql)) {
+        try (Connection conn = dataSource.getConnection();
+             Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                Championship championnat = new Championship(
-                        null,
-                        rs.getString("championship_name"),
-                        null,
-                        null
-                );
+                Championship champ = new Championship();
+                champ.setChampionnatName(rs.getString("championnat_nom"));
 
-                championships.add(championnat);
+                rankings.add(champ);
             }
         } catch (SQLException e) {
-            throw new RuntimeException("Error fetching championship rankings", e);
+            throw new RuntimeException("Erreur lors du calcul du classement des championnats", e);
         }
 
-        return championships;
+        return rankings;
     }
 }
