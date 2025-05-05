@@ -2,6 +2,7 @@ package org.example.fifa_central.DAO.repository;
 
 import org.example.fifa_central.DAO.DataSource;
 import org.example.fifa_central.model.Championnat;
+import org.example.fifa_central.model.Championship;
 import org.springframework.stereotype.Repository;
 
 import java.sql.*;
@@ -16,8 +17,8 @@ public class ChampionshipDAO {
         this.dataSource = new DataSource();
     }
 
-    public List<Championnat> getChampionshipRankings() {
-        List<Championnat> championships = new ArrayList<>();
+    public List<Championship> getChampionshipRankings() {
+        List<Championship> championships = new ArrayList<>();
         String sql = """
             WITH championship_stats AS (
                 SELECT 
@@ -47,7 +48,7 @@ public class ChampionshipDAO {
              ResultSet rs = statement.executeQuery(sql)) {
 
             while (rs.next()) {
-                Championnat championnat = new Championnat(
+                Championship championnat = new Championship(
                         null,
                         rs.getString("championship_name"),
                         null,

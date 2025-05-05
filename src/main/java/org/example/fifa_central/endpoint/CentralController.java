@@ -3,7 +3,7 @@ package org.example.fifa_central.endpoint;
 import org.example.fifa_central.DAO.repository.ChampionshipDAO;
 import org.example.fifa_central.DAO.repository.ClubDAO;
 import org.example.fifa_central.DAO.repository.PlayersDAO;
-import org.example.fifa_central.model.Championnat;
+import org.example.fifa_central.model.Championship;
 import org.example.fifa_central.model.Club;
 import org.example.fifa_central.model.Duration_type;
 import org.example.fifa_central.model.Player;
@@ -41,7 +41,7 @@ public class CentralController {
     }
 
     @GetMapping("/championshipRanking")
-    public List<Championnat> getChampionshipRankings() {
+    public List<Championship> getChampionshipRankings() {
         return championshipDAO.getChampionshipRankings();
     }
 }
