@@ -1,11 +1,24 @@
 package org.example.fifa_central.endpoint;
 
+import org.example.fifa_central.DAO.repository.ChampionshipDAO;
+import org.example.fifa_central.DAO.repository.ClubDAO;
+import org.example.fifa_central.DAO.repository.PlayersDAO;
+import org.example.fifa_central.model.Championnat;
+import org.example.fifa_central.model.Club;
+import org.example.fifa_central.model.Duration_type;
+import org.example.fifa_central.model.Player;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 public class CentralController {
+    private final PlayersDAO playersDAO = new PlayersDAO();
+    private final ClubDAO clubDAO = new ClubDAO();
+    private final ChampionshipDAO championshipDAO = new ChampionshipDAO();
 
     @PostMapping("/synchronisation")
     public String synchronisation() {
@@ -13,17 +26,22 @@ public class CentralController {
     }
 
     @GetMapping("/bestPlayers")
-    public String bestPlayers() {
-        return "Not implemented";
+    public List<Player> getBestPlayers(
+            @RequestParam(required = false, defaultValue = "5") int top,
+            @RequestParam Duration_type playingTimeUnit) {
+
+        return playersDAO.getBestPlayers(top, playingTimeUnit);
     }
 
     @GetMapping("/bestClubs")
-    public String bestClubs() {
-        return "Not implemented";
+    public List<Club> getBestClubs(
+            @RequestParam(required = false, defaultValue = "5") int top) {
+
+        return clubDAO.getBestClubs(top);
     }
 
     @GetMapping("/championshipRanking")
-    public String championshipRanking() {
-        return "Not implemented";
+    public List<Championnat> getChampionshipRankings() {
+        return championshipDAO.getChampionshipRankings();
     }
 }
